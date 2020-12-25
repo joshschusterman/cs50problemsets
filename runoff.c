@@ -52,7 +52,8 @@ int main(int argc, string argv[])
         return 2;
     }
     for (int i = 0; i < candidate_count; i++)
-    {   // This fills out the candidates array, sets their number of votes to 0 (to start), and sets eliminated to false.
+    {
+        // This fills out the candidates array, sets their number of votes to 0 (to start), and sets eliminated to false.
         candidates[i].name = argv[i + 1];
         candidates[i].votes = 0;
         candidates[i].eliminated = false;
@@ -144,34 +145,70 @@ bool vote(int voter, int rank, string name)
 // Tabulate votes for non-eliminated candidates
 void tabulate(void)
 {
-    // TODO
+    for (int i = 0; i < voter_count; i++) // outer loop through voters (vertical in matrix)
+    {
+        for (int j = 0; j < candidate_count; j++) // inner loop through candidates (preferences really, horizontal)
+        {
+            if (!candidates[preferences[i][j]].eliminated) // the candidate (0, 1, or 2) at matrix spot 0, 0, if NOT eliminated
+            {
+                candidates[preferences[i][j]].votes++; // increase their vote count.
+                break; // I *think* this is here because you only want to count the first preference vote for each voter?
+            }
+        }
+    }
     return;
 }
 
 // Print the winner of the election, if there is one
 bool print_winner(void)
 {
-    // TODO
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (candidates[i].votes > (voter_count / 2))
+        {
+            printf("%s\n", candidates[i].name);
+            return true;
+        }
+    }
     return false;
 }
 
 // Return the minimum number of votes any remaining candidate has
 int find_min(void)
 {
-    // TODO
-    return 0;
+    int least_votes = voter_count; // initialize least number of votes and set it to maximum, so we deduct from there
+    for (int i = 0; i < candidate_count; i++) // iterate over each candidate
+    {
+        if (!candidates[i].eliminated && candidates[i].votes <= least_votes) // if NOT elimiated and vote total is less than least
+        {
+            least_votes = candidates[i].votes; // least_votes is now that lower number.
+        }
+    }
+    return least_votes; // whatever the lowest number we get, return that, which will assign it to "min"
 }
 
 // Return true if the election is tied between all candidates, false otherwise
 bool is_tie(int min)
 {
-    // TODO
-    return false;
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (candidates[i].votes > min) // this works as long as find_min keeps doing its job
+        {
+            return false; // because if there's a candidate that has more than "min" votes, no tie, hence false
+        }
+    }
+    return true;
 }
 
 // Eliminate the candidate (or candidates) in last place
 void eliminate(int min)
 {
-    // TODO
+    for (int i = 0; i < candidate_count; i++)
+    {
+        if (candidates[i].votes == min)
+        {
+            candidates[i].eliminated = true;
+        }
+    }
     return;
 }
