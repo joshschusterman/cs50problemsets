@@ -13,7 +13,7 @@ typedef struct node
 node;
 
 // Number of buckets in hash table - *** Setting to 26 for now, one for each alphabet letter.
-const unsigned int N = 26;
+const unsigned int N = (LENGTH + 1) * 'z';
 
 // Hash table
 node *table[N];
@@ -26,10 +26,18 @@ bool check(const char *word)
 }
 
 // Hashes word to a number
-unsigned int hash(const char *word)
+unsigned int hash(const char *word) // FYI "unsigned" means no + o -, so basically a positive integer.
 {
-    // TODO
-    return 0;
+    int sum = 0;
+    // Loop through each character of the input word.
+    for (int i = 0; i < strlen(word); i++)
+    {
+        // We're adding the numeric ASCII value of all the letters in the word.
+        // Doing it this way automatically casts each character into its ASCII value, apparently.
+        sum += tolower(word[i]);
+    }
+    return (sum % N); // sum mod N in case the number goes over the number of "buckets" (N).
+    // *** I don't really understand how this function organizes the words into the "buckets"
 }
 
 // Loads dictionary into memory, returning true if successful else false
